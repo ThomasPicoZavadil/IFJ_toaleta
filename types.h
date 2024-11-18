@@ -4,6 +4,7 @@
 extern const char *function_id;
 extern int label_depth;
 extern int label_index;
+extern char *filename;
 
 typedef struct
 {

@@ -9,7 +9,7 @@ typedef struct
     size_t capacity; // Current capacity of the allocated memory
 } Dynamic_string;
 
-bool dynamic_string_init(Dynamic_string *dyn_str);
+bool dynamic_string_init(Dynamic_string *dyn_str, const char *filename);
 
 bool dynamic_string_resize(Dynamic_string *dyn_str, size_t new_capacity);
 
@@ -20,5 +20,7 @@ bool dynamic_string_add_const_str(Dynamic_string *dyn_str, const char *src);
 void dynamic_string_clear(Dynamic_string *dyn_str);
 
 void dynamic_string_free(Dynamic_string *dyn_str);
+
+bool dynamic_string_write_to_file(Dynamic_string *dyn_str, const char *filename);
 
 void dynamic_string_print(Dynamic_string *dyn_str);

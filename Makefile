@@ -10,6 +10,8 @@ SRC = simulation.c generator.c dynamic_string.c
 # Output Executable
 TARGET = simulation
 
+DELETE = output.txt
+
 # Build Rules
 all: $(TARGET)
 
@@ -17,4 +19,4 @@ $(TARGET): $(SRC)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) $(DELETE)

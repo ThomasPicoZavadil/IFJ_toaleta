@@ -5,16 +5,37 @@
 
 #define INITIAL_CAPACITY 16
 
-bool dynamic_string_init(Dynamic_string *dyn_str)
+char *filename = "output.txt";
+
+bool dynamic_string_init(Dynamic_string *dyn_str, const char *filename)
 {
+    if (dyn_str == NULL)
+    {
+        return false; // Invalid input
+    }
+
     dyn_str->str = (char *)malloc(INITIAL_CAPACITY * sizeof(char));
     if (dyn_str->str == NULL)
     {
         return false;
     }
+
     dyn_str->str[0] = '\0'; // Start with an empty string
     dyn_str->length = 0;
     dyn_str->capacity = INITIAL_CAPACITY;
+
+    // Create the file if filename is provided
+    if (filename != NULL)
+    {
+        FILE *file = fopen(filename, "w");
+        if (file == NULL)
+        {
+            free(dyn_str->str); // Clean up allocated memory
+            return false;       // Failed to create the file
+        }
+        fclose(file);
+    }
+
     return true;
 }
 
@@ -71,6 +92,26 @@ void dynamic_string_free(Dynamic_string *dyn_str)
     dyn_str->str = NULL;
     dyn_str->length = 0;
     dyn_str->capacity = 0;
+}
+
+bool dynamic_string_write_to_file(Dynamic_string *dyn_str, const char *filename)
+{
+    if (dyn_str == NULL || dyn_str->str == NULL || filename == NULL)
+    {
+        return false; // Invalid input
+    }
+
+    FILE *file = fopen(filename, "w");
+    if (file == NULL)
+    {
+        return false; // Failed to open the file
+    }
+
+    size_t written = fwrite(dyn_str->str, sizeof(char), dyn_str->length, file);
+    fclose(file);
+
+    // Check if the entire string was written successfully
+    return (written == dyn_str->length);
 }
 
 void dynamic_string_print(Dynamic_string *dyn_str)

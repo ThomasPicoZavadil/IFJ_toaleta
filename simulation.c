@@ -6,7 +6,7 @@
 int main()
 {
 
-    if (!dynamic_string_init(&dyn_str))
+    if (!dynamic_string_init(&dyn_str, filename))
     {
         return 1;
     }
@@ -35,7 +35,9 @@ int main()
 
     gen_if_start(function_id);
 
-    dynamic_string_print(&dyn_str);
+    dynamic_string_write_to_file(&dyn_str, filename);
+
+    /*dynamic_string_print(&dyn_str);*/
 
     return 0;
 }
