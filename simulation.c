@@ -31,6 +31,10 @@ int main()
 
     gen_operation(op);
 
+    gen_label(function_id, label_depth, label_index);
+
+    gen_if_start(function_id);
+
     dynamic_string_print(&dyn_str);
 
     return 0;

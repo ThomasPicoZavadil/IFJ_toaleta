@@ -1,9 +1,15 @@
+#include <stdio.h>
+
 #include "dynamic_string.h"
 #include "types.h"
+#include "generator.h"
 
 Dynamic_string dyn_str;
 operation op;
 stack_operation st_op;
+const char *function_id = "skibidi";
+int label_depth = 1;
+int label_index = 22;
 
 #define MAX_DIGITS 40
 
@@ -15,12 +21,12 @@ stack_operation st_op;
     if (!dynamic_string_add_const_str(&dyn_str, _to)) \
     return false
 
-#define ADD_INT(_str)             \
-    do                            \
-    {                             \
-        char str[MAX_DIGITS];     \
-        sprintf(str, "%d", _str); \
-        ADD_STR(str);             \
+#define ADD_INT(_to)             \
+    do                           \
+    {                            \
+        char str[MAX_DIGITS];    \
+        sprintf(str, "%d", _to); \
+        ADD_TOLINE(str);         \
     } while (0)
 
 #define readstr                                        \
@@ -76,11 +82,22 @@ bool gen_main_end()
     return true;
 }
 
+bool gen_label(const char *function_id, int label_depth, int label_index)
+{
+    ADD_TOLINE("LABEL $");
+    ADD_TOLINE(function_id);
+    ADD_TOLINE("%");
+    ADD_INT(label_depth);
+    ADD_TOLINE("%");
+    ADD_INT(label_index);
+    ADD_TOLINE("\n");
+
+    return true;
+}
+
 bool gen_function_start()
 {
-    ADD_LINE("\n#Function start");
-    ADD_TOLINE("LABEL ");
-    ADD_LINE("function_id");
+    gen_label(function_id, label_depth, label_index);
     ADD_LINE("CREATEFRAME");
     ADD_LINE("PUSHFRAME");
     return true;
@@ -88,35 +105,30 @@ bool gen_function_start()
 
 bool gen_function_end()
 {
-    ADD_LINE("\n#Function end");
-    ADD_TOLINE("LABEL ");
-    ADD_LINE("function_id");
+    ADD_LINE("\n//Function end");
     ADD_LINE("POPFRAME");
     ADD_LINE("RETURN");
     ADD_LINE("CLEARS");
     return true;
 }
 
-bool gen_call()
+bool gen_call(const char *function_id)
 {
-    ADD_TOLINE("CALL ");
-    ADD_LINE("function_id");
+    ADD_TOLINE("CALL $");
+    ADD_TOLINE(function_id);
+    ADD_TOLINE("\n");
     return true;
 }
 
-bool gen_label()
+bool gen_if_start(const char *function_id)
 {
-    return true;
-}
-
-bool gen_if_start()
-{
-    ADD_LINE("\n#If start");
+    ADD_LINE("\n//If start");
     ADD_LINE("DEFVAR temp");
     ADD_LINE("NOT temp");
-    ADD_TOLINE("JUMPIFEQ");
-    ADD_TOLINE("label_name");
-    ADD_TOLINE("temp");
+    ADD_TOLINE("JUMPIFEQ ");
+    ADD_TOLINE("$");
+    ADD_TOLINE(function_id);
+    ADD_TOLINE(" temp ");
     ADD_LINE("TRUE");
 
     return true;
@@ -129,7 +141,7 @@ bool gen_if_else()
 
 bool gen_if_end()
 {
-    ADD_LINE("\n#If end");
+    ADD_LINE("\n//If end");
 
     return true;
 }
@@ -155,7 +167,7 @@ bool gen_operation(operation op)
         break;
 
     case IDIV:
-        ADD_LINE("DIV");
+        ADD_LINE("IDIV");
         break;
 
     case EQUAL:

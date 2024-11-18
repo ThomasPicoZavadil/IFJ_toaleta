@@ -1,6 +1,10 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+extern const char *function_id;
+extern int label_depth;
+extern int label_index;
+
 typedef struct
 {
     int value;

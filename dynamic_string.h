@@ -21,4 +21,4 @@ void dynamic_string_clear(Dynamic_string *dyn_str);
 
 void dynamic_string_free(Dynamic_string *dyn_str);
 
-void dynamic_string_print();
+void dynamic_string_print(Dynamic_string *dyn_str);
