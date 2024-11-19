@@ -29,24 +29,24 @@ int label_index = 22;
         ADD_TOLINE(str);         \
     } while (0)
 
-#define readstr                                        \
-    LABEL readstr                                      \
-        CREATEFRAME                                    \
-            DEFVAR TF @input                           \
-                READ TF @input string                  \
-                    JUMPIFEQ end_readstr TF @input nil \
-                        STRLEN TF @length TF @input    \
-                            SUB TF @length TF @length int @1 GETCHAR TF @input TF @input int @0 end_readi32 : RETURN
+#define readstr                          \
+    "LABEL readstr"                      \
+    "CREATEFRAME"                        \
+    "DEFVAR TF @input"                   \
+    "READ TF @input string"              \
+    "JUMPIFEQ end_readstr TF @input nil" \
+    "STRLEN TF @length TF @input"        \
+    "SUB TF @length TF @length int @1 GETCHAR TF @input TF @input int @0 end_readi32 : RETURN"
 
-#define readi32                                                         \
-    LABEL readi32                                                       \
-        CREATEFRAME                                                     \
-            DEFVAR TF @input                                            \
-                READ TF @input int                                      \
-                    JUMPIFEQ end_readi32 TF @input nil                  \
-                        TYPE TF @type TF @input                         \
-                            JUMPIFNEQ end_readi32 TF @type string @ int \
-                                end_readi32 : RETURN
+#define readi32                                   \
+    "LABEL readi32"                               \
+    "CREATEFRAME"                                 \
+    "DEFVAR TF @input"                            \
+    "READ TF @input int"                          \
+    "JUMPIFEQ end_readi32 TF @input nil"          \
+    "TYPE TF @type TF @input"                     \
+    "JUMPIFNEQ end_readi32 TF @type string @ int" \
+    "end_readi32 : RETURN"
 
 #define readf64                                     \
     "LABEL readf64"                                 \
@@ -62,6 +62,15 @@ bool gen_header()
 {
     ADD_LINE("#Start of the program");
     ADD_LINE(".IFJCode24");
+
+    ADD_LINE("DEFVAR GF@%temp1");
+    ADD_LINE("DEFVAR GF@%temp2");
+    ADD_LINE("DEFVAR GF@%temp3");
+
+    ADD_LINE("DEFVAR GF@%exp_result");
+
+    ADD_LINE("JUMP main");
+
     return true;
 }
 
@@ -97,15 +106,17 @@ bool gen_label(const char *function_id, int label_depth, int label_index)
 
 bool gen_function_start()
 {
-    gen_label(function_id, label_depth, label_index);
-    ADD_LINE("CREATEFRAME");
+    ADD_LINE("\n#Function start");
+    ADD_TOLINE("LABEL ");
+    ADD_TOLINE(function_id);
+    ADD_TOLINE("\n");
     ADD_LINE("PUSHFRAME");
     return true;
 }
 
 bool gen_function_end()
 {
-    ADD_LINE("\n//Function end");
+    ADD_LINE("\n#Function end");
     ADD_LINE("POPFRAME");
     ADD_LINE("RETURN");
     ADD_LINE("CLEARS");
@@ -122,14 +133,10 @@ bool gen_call(const char *function_id)
 
 bool gen_if_start(const char *function_id)
 {
-    ADD_LINE("\n//If start");
-    ADD_LINE("DEFVAR temp");
-    ADD_LINE("NOT temp");
-    ADD_TOLINE("JUMPIFEQ ");
-    ADD_TOLINE("$");
+    ADD_LINE("\n#If start");
+    ADD_TOLINE("JUMPIFNEQ $");
     ADD_TOLINE(function_id);
-    ADD_TOLINE(" temp ");
-    ADD_LINE("TRUE");
+    ADD_LINE(" GF%exp_result bool@true\n");
 
     return true;
 }
@@ -141,7 +148,7 @@ bool gen_if_else()
 
 bool gen_if_end()
 {
-    ADD_LINE("\n//If end");
+    ADD_LINE("\n#If end");
 
     return true;
 }

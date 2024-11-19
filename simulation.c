@@ -19,17 +19,17 @@ int main()
     gen_function_start();
     gen_function_end();
 
-    op = PLUS;
+    st_op = S_PLUS;
 
-    gen_operation(op);
+    gen_stack_operation(st_op);
 
-    op = MINUS;
+    st_op = S_MINUS;
 
-    gen_operation(op);
+    gen_stack_operation(st_op);
 
-    op = TIMES;
+    st_op = S_TIMES;
 
-    gen_operation(op);
+    gen_stack_operation(st_op);
 
     gen_label(function_id, label_depth, label_index);
 
