@@ -5,7 +5,7 @@
 
 #define INITIAL_CAPACITY 16
 
-char *filename = "output.txt";
+char *filename = "output.ifjcode";
 
 bool dynamic_string_init(Dynamic_string *dyn_str, const char *filename)
 {
