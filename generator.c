@@ -3,6 +3,7 @@
 #include "dynamic_string.h"
 #include "types.h"
 #include "generator.h"
+#include "built_in_function.h"
 
 Dynamic_string dyn_str;
 operation op;
@@ -14,7 +15,7 @@ int label_index = 22;
 #define MAX_DIGITS 40
 
 #define ADD_LINE(_line)                                        \
-    if (!dynamic_string_add_const_str(&dyn_str, (_line "\n"))) \
+    if (!dynamic_string_add_const_str(&dyn_str, ("\n" _line))) \
     return false
 
 #define ADD_TOLINE(_to)                               \
@@ -29,35 +30,6 @@ int label_index = 22;
         ADD_TOLINE(str);         \
     } while (0)
 
-#define readstr                          \
-    "LABEL readstr"                      \
-    "CREATEFRAME"                        \
-    "DEFVAR TF @input"                   \
-    "READ TF @input string"              \
-    "JUMPIFEQ end_readstr TF @input nil" \
-    "STRLEN TF @length TF @input"        \
-    "SUB TF @length TF @length int @1 GETCHAR TF @input TF @input int @0 end_readi32 : RETURN"
-
-#define readi32                                   \
-    "LABEL readi32"                               \
-    "CREATEFRAME"                                 \
-    "DEFVAR TF @input"                            \
-    "READ TF @input int"                          \
-    "JUMPIFEQ end_readi32 TF @input nil"          \
-    "TYPE TF @type TF @input"                     \
-    "JUMPIFNEQ end_readi32 TF @type string @ int" \
-    "end_readi32 : RETURN"
-
-#define readf64                                     \
-    "LABEL readf64"                                 \
-    "CREATEFRAME"                                   \
-    "DEFVAR TF @input"                              \
-    "READ TF @input float"                          \
-    "JUMPIFEQ end_readf64 TF @input nil"            \
-    "TYPE TF @type TF @input"                       \
-    "JUMPIFNEQ end_readf64 TF @type string @ float" \
-    "end_readf64 : RETURN"
-
 bool gen_header()
 {
     ADD_LINE("#Start of the program");
@@ -69,7 +41,7 @@ bool gen_header()
 
     ADD_LINE("DEFVAR GF@%exp_result");
 
-    ADD_LINE("JUMP main");
+    ADD_LINE("JUMP $main");
 
     return true;
 }
@@ -77,7 +49,7 @@ bool gen_header()
 bool gen_main_start()
 {
     ADD_LINE("\n#Main start");
-    ADD_LINE("LABEL main");
+    ADD_LINE("LABEL $main");
     ADD_LINE("CREATEFRAME");
     ADD_LINE("PUSHFRAME");
     return true;
@@ -91,9 +63,27 @@ bool gen_main_end()
     return true;
 }
 
+bool gen_built_in_function()
+{
+    ADD_LINE(FUNCTION_READ_STR);
+    ADD_LINE(FUNCTION_READ_I32);
+    ADD_LINE(FUNCTION_READ_F64);
+    ADD_LINE(FUNCTION_WRITE);
+    ADD_LINE(FUNCTION_I2F);
+    ADD_LINE(FUNCTION_F2I);
+    ADD_LINE(FUNCTION_STRING);
+    ADD_LINE(FUNCTION_LENGTH);
+    ADD_LINE(FUNCTION_CONCAT);
+    ADD_LINE(FUNCTION_SUBSTRING);
+    ADD_LINE(FUNCTION_STRCMP);
+    ADD_LINE(FUNCTION_ORD);
+    ADD_LINE(FUNCTION_CHR);
+    return true;
+}
+
 bool gen_label(const char *function_id, int label_depth, int label_index)
 {
-    ADD_TOLINE("LABEL $");
+    ADD_LINE("LABEL $");
     ADD_TOLINE(function_id);
     ADD_TOLINE("%");
     ADD_INT(label_depth);
@@ -106,8 +96,8 @@ bool gen_label(const char *function_id, int label_depth, int label_index)
 
 bool gen_function_start()
 {
-    ADD_LINE("\n#Function start");
-    ADD_TOLINE("LABEL ");
+    ADD_LINE("#Function start");
+    ADD_TOLINE("LABEL $");
     ADD_TOLINE(function_id);
     ADD_TOLINE("\n");
     ADD_LINE("PUSHFRAME");
@@ -116,7 +106,7 @@ bool gen_function_start()
 
 bool gen_function_end()
 {
-    ADD_LINE("\n#Function end");
+    ADD_LINE("#Function end");
     ADD_LINE("POPFRAME");
     ADD_LINE("RETURN");
     ADD_LINE("CLEARS");
@@ -125,7 +115,7 @@ bool gen_function_end()
 
 bool gen_call(const char *function_id)
 {
-    ADD_TOLINE("CALL $");
+    ADD_LINE("CALL $");
     ADD_TOLINE(function_id);
     ADD_TOLINE("\n");
     return true;

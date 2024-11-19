@@ -10,7 +10,7 @@ SRC = simulation.c generator.c dynamic_string.c
 # Output Executable
 TARGET = simulation
 
-DELETE = output.txt
+DELETE = output.ifjcode
 
 # Build Rules
 all: $(TARGET)

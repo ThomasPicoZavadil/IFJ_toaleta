@@ -12,13 +12,11 @@ int main()
     }
 
     gen_header();
+    gen_built_in_function();
 
     gen_main_start();
     gen_main_end();
-
-    gen_function_start();
-    gen_function_end();
-
+    /*
     st_op = S_PLUS;
 
     gen_stack_operation(st_op);
@@ -30,10 +28,8 @@ int main()
     st_op = S_TIMES;
 
     gen_stack_operation(st_op);
-
+*/
     gen_label(function_id, label_depth, label_index);
-
-    gen_if_start(function_id);
 
     dynamic_string_write_to_file(&dyn_str, filename);
 
